@@ -331,9 +331,8 @@ by editing the `[project]/android/app/build.gradle` file.
 
     
 
-<p>
+
 You can find me on [![Twitter][1.2]][1].
 <!-- Icons -->
 [1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
 [1]: https://twitter.com/NidhiYashwanth/
-</p>
