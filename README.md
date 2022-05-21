@@ -1,14 +1,14 @@
-![Data_security](https://user-images.githubusercontent.com/65482596/169642697-c779767e-67ba-4fb1-80c0-a5b6cb1f5411.jpg)
+![Application_Security](https://user-images.githubusercontent.com/65482596/169656656-f90b63a2-1e08-489a-8c26-1e21dea5dd19.jpg)
 
 # how-to-better-secure-your-mobile-application
 
 # Hi there! <img width="30" src="https://camo.githubusercontent.com/e8e7b06ecf583bc040eb60e44eb5b8e0ecc5421320a92929ce21522dbc34c891/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f6876524a434c467a6361737252346961377a2f67697068792e676966">
 
-# This is a guide for securing mobile application against most of threats that still continue to troble application's security.
+## This is a guide for securing mobile application against most of threats that still continue to trouble application developers.
 
 ## Prepared and maintained by [Nidhi Yashwanth](https://github.com/nidhiyashwanth).
 
-## Will keep making changes as the requirements arise ❗
+### Will keep making changes as the requirements arise ❗
 
 ## Contents - How to better secure your app?
 
@@ -22,7 +22,7 @@
 * [Test test and test again](#test-test-and-test-again)
 * [Audit third-party libraries](#audit-third-party-libraries)
 
-### Introduction Security
+### Introduction to Security
 
 -The goal is to make Android the safest mobile platform in the world. That's why we consistently invest in technologies that bolster the security of the platform, its apps, and the global Android ecosystem.
 -I'm delighted to share with you my findings on how to keep users safe and secure.
