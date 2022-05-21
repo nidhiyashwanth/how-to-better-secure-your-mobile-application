@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="CyberSecurity" src="(https://img.freepik.com/free-vector/global-data-security-personal-data-security-cyber-data-security-online-concept-illustration-internet-security-information-privacy-protection_1150-37375.jpg)">
+![Data_security](https://user-images.githubusercontent.com/65482596/169642697-c779767e-67ba-4fb1-80c0-a5b6cb1f5411.jpg)
 </p>
 
 # how-to-better-secure-your-mobile-application
@@ -12,7 +12,7 @@
 
 ## Will keep making changes as the requirements arise ❗
 
-## Contents - How you can secure your app?
+## Contents - How to better secure your app?
 
 * [Introduction Security](#introduction-security)
 * [Encrypt your data](#encrypt-your-data)
@@ -24,7 +24,6 @@
 * [Test test and test again](#test-test-and-test-again)
 * [Audit third-party libraries](#audit-third-party-libraries)
 
-
 ### Introduction Security
 
 -The goal is to make Android the safest mobile platform in the world. That's why we consistently invest in technologies that bolster the security of the platform, its apps, and the global Android ecosystem.
@@ -33,6 +32,110 @@
 ### Encrypt your data
 
 - The Security library provides an implementation of the [security best practices](https://developer.android.com/topic/security/best-practices) related to reading and writing data at rest, as well as key creation and verification.
+- The library uses the builder pattern to provide safe default settings for the following security levels:
+    - Strong security that balances great encryption and good performance. This level of security is appropriate for consumer apps, such as banking and chat apps, as well as enterprise apps that perform certificate revocation checking.
+    - Maximum security. This level of security is appropriate for apps that require a hardware-backed keystore and user presence for providing key access.
+    - **Key management**
+    	- A **keyset** that contains one or more keys to encrypt a file or shared preferences data. The keyset itself is stored in `SharedPreferences`. 
+    	- A **primary (master) key** that encrypts all keysets. This key is stored using the Android keystore system.
+    - **Classes included in library**
+    	- **EncryptedFile:** Provides custom implementations of `FileInputStream` and `FileOutputStream`, granting your app more secure streaming read and write operations.
+    	- **EncryptedSharedPreferences:** Wraps the SharedPreferences class and automatically encrypts keys and values using a two-scheme method:
+    		- **Keys** are encrypted using a deterministic encryption algorithm such that the key can be encrypted and properly looked up.
+    		- **Values** are encrypted using AES-256 GCM and are non-deterministic.
+    
+	- **The following sections show how to use these classes to perform common operations with files and shared preferences.**
+		- To use the Security library, add the following dependency to your app module's build.gradle file:
+			
+```
+			dependencies {
+			implementation "androidx.security:security-crypto:1.0.0-rc04"
+
+			// For Identity Credential APIs
+			implementation "androidx.security:security-identity-credential:1.0.0-alpha02"
+			}
+```
+
+Read Files The following code snippet demonstrates how to use EncryptedFile to read the contents of a file in a more secure way:
+
+```kotlin
+
+	// Although you can define your own key generation parameter specification, it's
+	// recommended that you use the value specified here.
+	val mainKey = MasterKey.Builder(applicationContext)
+	.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+	.build()
+	val fileToRead = "my_sensitive_data.txt"
+	val encryptedFile = EncryptedFile.Builder(
+	applicationContext,
+	File(DIRECTORY, fileToRead),
+	mainKey,
+	EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+	).build()
+
+	val inputStream = encryptedFile.openFileInput()
+	val byteArrayOutputStream = ByteArrayOutputStream()
+	var nextByte: Int = inputStream.read()
+	while (nextByte != -1) {
+	byteArrayOutputStream.write(nextByte)
+	nextByte = inputStream.read()
+	}
+
+	val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
+
+```
+
+Write files The following code snippet demonstrates how to use `EncryptedFile` to write the contents of a file in a more secure way:
+
+```kotlin
+
+	// Although you can define your own key generation parameter specification, it's
+	// recommended that you use the value specified here.
+	val mainKey = MasterKey.Builder(applicationContext)
+	.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+	.build()
+
+	// Create a file with this name, or replace an entire existing file
+	// that has the same name. Note that you cannot append to an existing file,
+	// and the file name cannot contain path separators.
+	val fileToWrite = "my_sensitive_data.txt"
+	val encryptedFile = EncryptedFile.Builder(
+	applicationContext,
+	File(DIRECTORY, fileToWrite),
+	mainKey,
+	EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+	).build()
+
+	val fileContent = "MY SUPER-SECRET INFORMATION"
+	.toByteArray(StandardCharsets.UTF_8)
+	encryptedFile.openFileOutput().apply {
+	write(fileContent)
+	flush()
+	close()
+	}
+
+```
+
+**For use cases requiring additional security, complete the following steps:**
+
+1. Create a `KeyGenParameterSpec.Builder` object, passing `true` into [setUserAuthenticationRequired()](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationRequired(boolean)) and a value greater than 0 into [setUserAuthenticationValidityDurationSeconds().](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationValidityDurationSeconds(int))
+2. Prompt the user to enter credentials using createConfirmDeviceCredentialIntent(). Learn more about how to request [user authentication for key use.](https://developer.android.com/training/articles/keystore#UserAuthentication)
+3. Override `onActivityResult()` to get the confirmed credential callback.
+
+For more information, see [Requiring user authentication for key use.](https://developer.android.com/training/articles/keystore#UserAuthentication)
+
+
+### Detect insecure devices
+
+- Rooted or unlocked devices, or emulators may fail to protect user data and expose your app to attack. Use SafetyNet Attestation to determine if a device running your app has been tampered with. Based on the results from SafetyNet Attestation, consider acting to protect your app’s content.
+- The SafetyNet Attestation API is an anti-abuse API that allows app developers to assess the Android device their app is running on. The API should be used as a part of your abuse detection system to help determine whether your servers are interacting with your genuine app running on a genuine Android device.
+- The SafetyNet Attestation API provides a cryptographically-signed attestation, assessing the device's integrity. In order to create the attestation, the API examines the device's software and hardware environment, looking for integrity issues, and comparing it with the reference data for approved Android devices. The generated attestation is bound to the nonce that the caller app provides. The attestation also contains a generation timestamp and metadata about the requesting app.
+
+
+### Authenticate users and keys with biometrics
+- Use the [Biometric APIs](https://developer.android.com/training/sign-in/biometric-auth), part of the Jetpack BiometricPrompt Library, to take advantage of a device’s biometric sensors when authenticating users in your app.
+
+
 
 
 
