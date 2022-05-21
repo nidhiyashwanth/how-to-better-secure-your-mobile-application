@@ -1,6 +1,4 @@
-<p align="center">
 ![Data_security](https://user-images.githubusercontent.com/65482596/169642697-c779767e-67ba-4fb1-80c0-a5b6cb1f5411.jpg)
-</p>
 
 # how-to-better-secure-your-mobile-application
 
@@ -8,7 +6,7 @@
 
 # This is a guide for securing mobile application against most of threats that still continue to troble application's security.
 
-## Prepared and maintained by [Nidhi Yashwanth](https://github.com/nidhiyashwanth)) who's been working on this project for past three months.
+## Prepared and maintained by [Nidhi Yashwanth](https://github.com/nidhiyashwanth).
 
 ## Will keep making changes as the requirements arise ❗
 
@@ -43,6 +41,7 @@
     	- **EncryptedSharedPreferences:** Wraps the SharedPreferences class and automatically encrypts keys and values using a two-scheme method:
     		- **Keys** are encrypted using a deterministic encryption algorithm such that the key can be encrypted and properly looked up.
     		- **Values** are encrypted using AES-256 GCM and are non-deterministic.
+    
     
 	- **The following sections show how to use these classes to perform common operations with files and shared preferences.**
 		- To use the Security library, add the following dependency to your app module's build.gradle file:
@@ -134,6 +133,143 @@ For more information, see [Requiring user authentication for key use.](https://d
 
 ### Authenticate users and keys with biometrics
 - Use the [Biometric APIs](https://developer.android.com/training/sign-in/biometric-auth), part of the Jetpack BiometricPrompt Library, to take advantage of a device’s biometric sensors when authenticating users in your app.
+
+
+### Communicate securely
+- HTTPS and SSL provide secure protocols for transferring data between your app and servers. However, there are a number of common mistakes that developers make that can lead to insecure data transfer. Check that you’re not making any of these in your app.
+- [Security with HTTPS and SSL](https://developer.android.com/training/articles/security-ssl)
+- The Secure Sockets Layer (SSL)—now technically known as [Transport Layer Security](https://en.wikipedia.org/wiki/Transport_Layer_Security) (TLS)—is a common building block for encrypted communications between clients and servers. It's possible that an application might use SSL incorrectly such that malicious entities may be able to intercept an app's data over the network. To help you ensure that this does not happen to your app, this article highlights the common pitfalls when using secure network protocols and addresses some larger concerns about using Public-Key Infrastructure (PKI).
+- **Concepts**
+	- In a typical SSL usage scenario, a server is configured with a certificate containing a public key as well as a matching private key. As part of the handshake between an SSL client and server, the server proves it has the private key by signing its certificate with [public-key cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography).
+	- However, anyone can generate their own certificate and private key, so a simple handshake doesn't prove anything about the server other than that the server knows the private key that matches the public key of the certificate. One way to solve this problem is to have the client have a set of one or more certificates it trusts. If the certificate is not in the set, the server is not to be trusted.
+	- There are several downsides to this simple approach. Servers should be able to upgrade to stronger keys over time ("key rotation"), which replaces the public key in the certificate with a new one. Unfortunately, now the client app has to be updated due to what is essentially a server configuration change. This is especially problematic if the server is not under the app developer's control, for example if it is a third party web service. This approach also has issues if the app has to talk to arbitrary servers such as a web browser or email app.
+	- In order to address these downsides, servers are typically configured with certificates from well known issuers called [Certificate Authorities (CAs)](https://en.wikipedia.org/wiki/Certificate_authority). The host platform generally contains a list of well known CAs that it trusts. As of Android 8.0 (Nougat), Android currently contains over 100 CAs that are updated in each release and do not change from device to device. Similar to a server, a CA has a certificate and a private key. When issuing a certificate for a server, the CA signs the server certificate using its private key. The client can then verify that the server has a certificate issued by a CA known to the platform.
+	- [Learn More...](https://developer.android.com/training/articles/security-ssl)
+
+
+### Address issues found by Google Play
+- The App Security Improvement program is a service that helps detect known security vulnerabilities in your app. This service automatically scans your app as it’s submitted to Google Play. If any vulnerabilities are discovered, you get alerts by email and in the Google Play Console, with links to details about how to improve your app.
+- [App security improvement program](https://developer.android.com/google/play/asi)
+- The App Security Improvement program is a service provided to Google Play app developers to improve the security of their apps. The program provides tips and recommendations for building more secure apps and identifies potential security enhancements when your apps are uploaded to Google Play. To date, the program has facilitated developers to fix over 1,000,000 apps on Google Play.
+- **How it works**
+	- Before any app is accepted into Google Play, we scan it for safety and security, including potential security issues. We also continuously re-scan the over one million apps on Google Play for additional threats.
+	- If your app is flagged for a potential security issue, we'll notify you immediately to help you quickly address the issue and help keep your users safe. We’ll deliver alerts to you using both email and the Google Play Console, with links to a support page with details about how to improve the app.
+	- Typically, these notifications will include a timeline for delivering the improvement to users as quickly as possible. For some kinds of issues, we may require you to make security improvements in the app before you can publish any more updates to it.
+	- You can confirm that you’ve fully addressed the issue by uploading the new version of your app to the Google Play Console. Be sure to increment the version number of the fixed app. After a few hours, check the Play Console for the security alert; if it’s no longer there, you’re all set.
+	- - **Example of a security improvement alert for an app in the Play Console.**
+		![google_play_security_notification](https://user-images.githubusercontent.com/65482596/169651062-d580622a-a914-4fb7-8fdb-3d8829a131fb.png)
+	- [Learn More...](https://developer.android.com/google/play/asi)
+
+
+### Be the first to know
+- You cannot eliminate the possibility of there being undetected vulnerabilities in your app. Security researchers commonly assess new and updated apps for security issues. By setting up a vulnerability disclosure program (VDP) you provide guidelines for these experts to disclose vulnerabilities to you.
+	- [Learn More...](https://developers.google.com/android/play-protect/starting-a-vdp)
+
+
+### Test test and test again
+
+- [Fundamentals of Testing](https://developer.android.com/security)
+- **Organize your code for testing**
+	- As your app expands, you might find it necessary to fetch data from a server, interact with the device's sensors, access local storage, or render complex user interfaces. The versatility of your app demands a comprehensive testing strategy.
+	- Create and test code iteratively
+		- When developing a feature iteratively, you start by either writing a new test or by adding cases and assertions to an existing unit test. The test fails at first because the feature isn't implemented yet.
+		- It's important to consider the units of responsibility that emerge as you design the new feature. For each unit, you write a corresponding unit test. Your unit tests should nearly exhaust all possible interactions with the unit, including standard interactions, invalid inputs, and cases where resources aren't available. Take advantage of [Jetpack libraries](https://developer.android.com/jetpack) whenever possible; when you use these well-tested libraries, you can focus on validating behavior that's specific to your app.
+		- The two cycles associated with iterative, test-driven
+		- ![](https://developer.android.com/images/training/testing/testing-workflow.png)
+		- The full workflow, as shown in Figure 1, contains a series of nested, iterative cycles where a long, slow, UI-driven cycle tests the integration of code units. You test the units themselves using shorter, faster development cycles. This set of cycles continues until your app satisfies every use case.
+		- **View your app as a series of modules**
+		- To make your code easier to test, develop your code in terms of modules, where each module represents a specific task that users complete within your app. This perspective contrasts the stack-based view of an app that typically contains layers representing the UI, business logic, and data.
+		- It's important to set well-defined boundaries around each module, and to create new modules as your app grows in scale and complexity. Each module should have only one area of focus, and the APIs that allow for inter-module communication should be consistent. To make it easier and quicker to test these inter-module interactions, consider creating fake implementations of your modules. In your tests, the real implementation of one module can call the fake implementation of the other module.
+		- - To learn more about how to define modules in your app, as well as platform support for creating and publishing modules, see Android App Bundles.
+		- [Learn More...](https://developer.android.com/training/testing/fundamentals)
+
+
+### Audit third-party libraries
+- Your app may rely on third-party libraries for common use cases. However, third-party libraries can be a source of data leakage, especially those using external services, such as those for marketing and analytics.
+- Audit your third-party libraries to check that you are using the original code from its open source project. Also, check to see whether any libraries are unnecessary. Then remove any libraries you don’t need or where you cannot be sure of the source.
+- This step is important because third-party libraries can cause your app to be flagged as potentially harmful per the Malware or Mobile Unwanted Software policies.
+- [Potentially Harmful Applications (PHAs)](https://developers.google.com/android/play-protect/potentially-harmful-applications)
+	- Potentially Harmful Applications (PHAs) are apps that could put users, user data, or devices at risk. These apps are often generically referred to as malware. We've developed a range of categories for different types of PHAs, including trojans, phishing, and spyware apps, and we are continuously updating and adding new categories.
+	- **Potentially harmful?**
+		- There is some confusion around the ambiguity of the word potentially when used to describe malicious apps. Google Play Protect removes apps that have been flagged as Potentially Harmful because the app does contain malicious behavior not because we are simply unsure if the app is harmful or not. The word potentially is used here because malicious apps function differently depending on a variety of variables thus an app that is harmful to one Android device might not pose a risk at all to another Android device. For example, a device running the latest version of Android is not affected by harmful apps which use deprecated APIs to perform malicious behavior but a device that is still running a very early version of Android might be at risk. Mobile billing fraud poses a risk to devices connected to service carriers but devices which only connect to WIFI are not affected by these apps.
+		- Apps are flagged as a PHA if they clearly pose a risk to some or all Android devices and users.
+	- **User-wanted PHAs**
+		- Some apps that can weaken or disable Android security features aren't categorized as PHAs. These apps provide functionality that users want, such as rooting the device and other development features. Even though these apps are potentially harmful, users install them intentionally, so Google Play Protect manages them differently than other PHAs.
+		- When a user begins to installI an app that's classified as user-wanted, Google Play Protect warns the user of the app's potential hazards just once. The user can decide whether to continue with the installation. After installation, the user-wanted classifications prevents Google Play Protect from sending additional warnings, so there's no disruption to the user experience.
+	- **Classifications**
+		- There are several categories for classifying PHAs that help Play Protect detect them and determine the right action to take. These categories include malicious apps like trojans, spyware, and phishing apps, as well as user-wanted apps. If Play Protect detects a PHA, it displays a warning. For certain malicious apps, Play Protect automatically disables or removes the app. When Play Protect detects that a PHA contains features from multiple categories, it classifies the app based on the most harmful characteristics. For example, if an app applies to both ransomware and spyware categories, the Verify Apps message identifies it as ransomware.
+		- You can view the current PHA categories and definitions [here.](https://developers.google.com/android/play-protect/phacategories)
+
+
+# Hash-code-generation-Singing-apk
+
+### Introduction
+- During a typical development cycle, you test an app using `flutter run` at the command line,or by using the **Run** and **Debug** options in your IDE. By default, Flutter builds a _debug_ version of your app.
+- When you're ready to prepare a _release_ version of your app, for example to [publish to the Google Play Store][play], this page can help. Before publishing, you might want to put some finishing touches on your app.
+
+## Adding a launcher icon
+
+- When a new Flutter app is created, it has a default launcher icon.To customize this icon, you might want to check out the [flutter_launcher_icons][] package.
+
+## Enabling Material Components
+
+If your app uses [Platform Views][], you may want to enable
+Material Components by following the steps described in the
+[Getting Started guide for Android][].
+
+For example:
+
+1. Add the dependency on Android's Material in `<my-app>/android/app/build.gradle`:
+
+```groovy
+dependencies {
+    // ...
+    implementation 'com.google.android.material:material:<version>'
+    // ...
+}
+```
+
+To find out the latest version, visit [Google Maven][].
+
+## Signing the app
+
+To publish on the Play Store, you need to give your app a digital
+signature. Use the following instructions to sign your app.
+
+On Android, there are two signing keys: deployment and upload. The end-users 
+download the .apk signed with the 'deployment key'. An 'upload key' is used to 
+authenticate the .aab / .apk uploaded by developers onto the Play Store and is 
+re-signed with the deployment key once in the Play Store.
+* It's highly recommended to use the automatic cloud managed signing for
+  the deployment key. For more information, see the [official Play Store documentation][].
+
+### Create an upload keystore
+
+If you have an existing keystore, skip to the next step.
+If not, create one by either:
+* Following the [Android Studio key generation steps]({{site.android-dev}}/studio/publish/app-signing#sign-apk) 
+* Running the following at the command line:
+
+    On Mac/Linux, use the following command:
+
+    ```terminal
+    keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+    ```
+
+    On Windows, use the following command:
+
+    ```terminal
+    keytool -genkey -v -keystore c:\Users\USER_NAME\upload-keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+    ```
+
+    This command stores the `upload-keystore.jks` file in your home
+    directory. If you want to store it elsewhere, change
+    the argument you pass to the `-keystore` parameter.
+    **However, keep the `keystore` file private;
+    don't check it into public source control!**
+    - [Learn More...](https://docs.flutter.dev/deployment/android#signing-the-app)
+
+
 
 
 
