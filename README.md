@@ -207,41 +207,16 @@ For more information, see [Requiring user authentication for key use.](https://d
 - During a typical development cycle, you test an app using `flutter run` at the command line,or by using the **Run** and **Debug** options in your IDE. By default, Flutter builds a _debug_ version of your app.
 - When you're ready to prepare a _release_ version of your app, for example to [publish to the Google Play Store][play], this page can help. Before publishing, you might want to put some finishing touches on your app.
 
-## Adding a launcher icon
-
-- When a new Flutter app is created, it has a default launcher icon.To customize this icon, you might want to check out the [flutter_launcher_icons][] package.
-
-## Enabling Material Components
-
-If your app uses [Platform Views][], you may want to enable
-Material Components by following the steps described in the
-[Getting Started guide for Android][].
-
-For example:
-
-1. Add the dependency on Android's Material in `<my-app>/android/app/build.gradle`:
-
-```groovy
-dependencies {
-    // ...
-    implementation 'com.google.android.material:material:<version>'
-    // ...
-}
-```
-
-To find out the latest version, visit [Google Maven][].
 
 ## Signing the app
 
-To publish on the Play Store, you need to give your app a digital
-signature. Use the following instructions to sign your app.
+### Methods to Sign an App
 
-On Android, there are two signing keys: deployment and upload. The end-users 
-download the .apk signed with the 'deployment key'. An 'upload key' is used to 
-authenticate the .aab / .apk uploaded by developers onto the Play Store and is 
-re-signed with the deployment key once in the Play Store.
-* It's highly recommended to use the automatic cloud managed signing for
-  the deployment key. For more information, see the [official Play Store documentation][].
+1)By using Keytool + android Studio
+
+2)All by Android Studio itself. (New method)
+
+ - Method 1:By using Keytool + android Studio
 
 ### Create an upload keystore
 
@@ -269,20 +244,96 @@ If not, create one by either:
     don't check it into public source control!**
     - [Learn More...](https://docs.flutter.dev/deployment/android#signing-the-app)
 
+### Reference the keystore from the app
+
+Create a file named `[project]/android/key.properties`
+that contains a reference to your keystore:
+
+```
+storePassword=<password from previous step>
+keyPassword=<password from previous step>
+keyAlias=upload
+storeFile=<location of the key store file, such as /Users/<user name>/upload-keystore.jks>
+```
+
+### Configure signing in gradle
+
+- Configure gradle to use your upload key when building your app in release mode 
+by editing the `[project]/android/app/build.gradle` file.
+- [for more...](https://docs.flutter.dev/deployment/android#configure-signing-in-gradle)
 
 
+####  How will it protects google people and developer ?
+
+- KeyStore has Private key ,Public Key and many other data.
+- After signing an app ,and placing in playstore ,Playstore has public key of that app.
+- So when next any body want to update the app in playstore ,one need to sign in the app with it private key.
+- And playstore can check it authenticity by using available public key of that app .
+- you cant update application without same keystore value else app show different signature. for example you installed an app from playstore after some days if an update come for application then you will only be able to update previous app if its signature and new app signature is same.
+- So keep your KeyStore save ,other wise you can't able to update your app in playstore.And i am sure you know the consequence of this.
+-You will surprise to know that ,when ever you debug the app it singed with KeyStore evey time.
+- Now i know ,What you will Ask ,i have't done this any time, So this is automatically done by android sdk.
+- So
+    - There are two build modes in android
+    - `debug mode`: when you are developing and testing your application.
+    - `release mode` :when you want to build a release version of your application that you can distribute directly to users or publish on an application marketplace such as Google Play.
+    -The Android build process signs your application differently depending on which build mode you use to build your application.
+
+    - When you build in debug mode the Android SDK build tools use the Keytool utility (included in the JDK) to create a debug key. Because the SDK build tools created the debug key, they know the debug key's alias and password. Each time you compile your application in debug mode, the build tools use the debug key along with the Jarsigner utility (also included in the JDK) to sign your application's .apk file. Because the alias and password are known to the SDK build tools, the tools don't need to prompt you for the debug key's alias and password each time you compile.
+
+    - When you build in release mode you use your own private key to sign your application. If you don't have a private key, you can use the Keytool utility to create one for you. When you compile your application in release mode, the build tools use your private key along with the Jarsigner utility to sign your application's .apk file. Because the certificate and private key you use are your own, you must provide the password for the keystore and key alias.
+
+    - The debug signing process happens automatically when you run or debug your application using Eclipse with the ADT plugin. Debug signing also happens automatically when you use the Ant build script with the debug option. You can automate the release signing process by using the Eclipse Export Wizard or by modifying the Ant build script and building with the release option.
+
+- You May some found deug.keystore or release.keystore ,these are keystore files
+- `debug.keystore` file is merely for developing and testing purposes, so using that you can't release your app to Google Play using that only.
+- Caution: You cannot release your application to the public when signed with the debug certificate.
+- `release.keystore` file is required only when you want to release your app to Google Play.
+
+### Get Key Fingerprints
+
+- To hook your app up with services like Google APIs you'll need to print out each of your keys' fingerprints and give them to the services you're using. To do that, use:
+    
+    ```$ keytool -list -v -keystore [keystore path] -alias [alias-name] -storepass [storepass] -keypass [keypass]```
+    [learn more...](https://flutteragency.com/how-to-generate-sha-1-in-flutter/)
 
 
+### Other Security Stuffs
+
+- SSL
+
+    - SSL (Secure Sockets Layer) is the standard security technology for establishing an encrypted link between a web server and a browser. This link ensures that all data passed between the web server and browsers remain private and integral.
+
+- HTPPS=HTTP+SSL
+
+    - https://www.youtube.com/watch?v=JCvPnwpWVUQ
+
+    - https://www.youtube.com/watch?v=SJJmoDZ3il8
 
 
+- SHA
+
+    - In cryptography, SHA-1 (Secure Hash Algorithm 1) is a cryptographic hash function designed by the United States National Security Agency and is a U.S. Federal Information Processing Standard published by the United States NIST. SHA-1 produces a 160-bit (20-byte) hash value known as a message digest. A SHA-1 hash value is typically rendered as a hexadecimal number, 40 digits long.
+
+    - SHA-1 is no longer considered secure against well-funded opponents. In 2005, cryptanalysts found attacks on SHA-1 suggesting that the algorithm might not be secure enough for ongoing use, and since 2010 many organizations have recommended its replacement by SHA-2 or SHA-3. Microsoft, Google and Mozilla have all announced that their respective browsers will stop accepting SHA-1 SSL certificates by 2017.
 
 
+- Digest
+
+    - Digest access authentication is one of the methods a web server can use to negotiate credentials, such as username or password, with a user's web browser. This can be used to confirm the identity of a user before sending sensitive information, such as online banking transaction history. It applies a hash function to the username and password before sending them over the network.
+
+    - Technically, digest authentication is an application of MD5 cryptographic hashing with usage of nonce values to prevent replay attacks. It uses the HTTP protocol.
 
 
+- MD5
 
+    - MD5 is an algorithm that is used to verify data integrity through the creation of a 128-bit message digest from data input (which may be a message of any length) that is claimed to be as unique to that specific data as a fingerprint is to the specific individual.
 
+    
 
+<p>
 You can find me on [![Twitter][1.2]][1].
 <!-- Icons -->
 [1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
 [1]: https://twitter.com/NidhiYashwanth/
+</p>
